@@ -27,7 +27,7 @@ module.exports = function destroyOneRecord (req, res) {
   .then(function(record) {
     if(!record) return res.notFound('No record found with the specified `id`.');
 
-    Model.destroy({ where: { id: pk }}).then(function() {
+    return Model.destroy({ where: { id: pk }}).then(function() {
 
       if (req._sails.hooks.pubsub) {
         Model.publishDestroy(pk, !req._sails.config.blueprints.mirror && req, {previous: record});

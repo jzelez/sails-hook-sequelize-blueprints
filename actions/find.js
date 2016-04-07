@@ -52,7 +52,7 @@ module.exports = function findRecords (req, res) {
     return require('./findOne')(req,res);
   }
   // Lookup for records that match the specified criteria
-  Model.findAll({
+  return Model.findAll({
     where: actionUtil.parseCriteria(req),
     limit: limit,
     offset: offset,

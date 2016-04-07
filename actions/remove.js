@@ -54,21 +54,21 @@ module.exports = function remove(req, res) {
     return res.serverError('Missing required child PK.');
   }
 
-  Model.findById(parentPk, { include: [{ all: true, nested: true }]}).then(function(parentRecord) {
+  return Model.findById(parentPk, { include: [{ all: true, nested: true }]}).then(function(parentRecord) {
     if (!parentRecord) return res.notFound();
     if (!parentRecord[relation]) return res.notFound();
 
     if (isManyToManyThrough) {
       var throughRemove = { };
       throughRemove[childAttr] = childPk;
-      ThroughModel.destroy({ where: throughRemove }).then(function(){
+      return ThroughModel.destroy({ where: throughRemove }).then(function(){
         return returnParentModel();
       })
       .catch(function(err) {
         return res.negotiate(err);
       });
     } else { // not M-M
-      ChildModel.destroy({ where: childRemove }).then(function(){
+      return ChildModel.destroy({ where: childRemove }).then(function(){
         return returnParentModel();
       }).catch(function(err){
         return res.negotiate(err);
@@ -79,7 +79,7 @@ module.exports = function remove(req, res) {
   });
 
   function returnParentModel () {
-    Model.findById(parentPk, { include: req._sails.config.blueprints.populate ? [{ all: true, nested: true }] : [] })
+    return Model.findById(parentPk, { include: req._sails.config.blueprints.populate ? [{ all: true, nested: true }] : [] })
     // .populate(relation)
     // TODO: use populateEach util instead
     .then(function(parentRecord) {

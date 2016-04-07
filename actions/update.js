@@ -46,11 +46,11 @@ module.exports = function updateOneRecord (req, res) {
   // (Note: this could be achieved in a single query, but a separate `findOne`
   //  is used first to provide a better experience for front-end developers
   //  integrating with the blueprint API.)
-  Model.findById(pk).then(function(matchingRecord) {
+  return Model.findById(pk).then(function(matchingRecord) {
 
     if (!matchingRecord) return res.notFound();
 
-    Model.update(values, { where: { id: pk }}).then(function(records) {
+    return Model.update(values, { where: { id: pk }}).then(function(records) {
       // Because this should only update a single record and update
       // returns an array, just use the first item.  If more than one
       // record was returned, something is amiss.
@@ -74,7 +74,7 @@ module.exports = function updateOneRecord (req, res) {
       // (Note: again, this extra query could be eliminated, but it is
       //  included by default to provide a better interface for integrating
       //  front-end developers.)
-      var Q = Model.findById(updatedRecord, {include: req._sails.config.blueprints.populate ? [{ all: true, nested: true }] : []})
+      return Model.findById(updatedRecord, {include: req._sails.config.blueprints.populate ? [{ all: true, nested: true }] : []})
       .then(function(populatedRecord) {
         if (!populatedRecord) return res.serverError('Could not find record after updating!');
         res.ok(populatedRecord);
@@ -90,7 +90,7 @@ module.exports = function updateOneRecord (req, res) {
                 status: 400,
                 message: err.message,
                 errors: err.errors
-            }
+            };
         }
       return res.negotiate(err);
     });
